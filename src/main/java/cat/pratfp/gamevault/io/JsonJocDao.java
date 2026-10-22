@@ -61,6 +61,9 @@ public class JsonJocDao {
      */
     public List<Joc> llegeix(Path p) throws IOException {
         // Escriu aquí el teu codi (PR1-09)
-        throw new UnsupportedOperationException("PR1-09: encara no està fet");
+
+        //Passem de Jackson a Java, indicant-li d'on ha de llegir les dades
+        //Després creem una classe anònima x guardar els objectes de la classe joc en una llista
+        return mapper.readValue(p.toFile(), new TypeReference<List<Joc>>() {});
     }
 }
