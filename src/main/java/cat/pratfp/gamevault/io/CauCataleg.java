@@ -29,7 +29,12 @@ public class CauCataleg {
      */
     public void desa(Path p, List<Joc> jocs) throws IOException {
         // Escriu aquí el teu codi (PR1-11)
-        throw new UnsupportedOperationException("PR1-11: encara no està fet");
+
+        //S'obre el flux de sortida de fitxer amb Files.newOutputStream(p)
+        //Després envia la llista convertida x assegurar un tipus concret
+        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(p))) {
+            oos.writeObject(new ArrayList<>(jocs));
+        }
     }
 
     /**
@@ -42,6 +47,13 @@ public class CauCataleg {
     @SuppressWarnings("unchecked")
     public List<Joc> carrega(Path p) throws IOException {
         // Escriu aquí el teu codi (PR1-11)
-        throw new UnsupportedOperationException("PR1-11: encara no està fet");
+
+        //S'obre el flux d'entrada, llegeix l'objecte
+        //Si la classe no es troba, la captura i la torna a llançar reempaquetada en una excep
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(p))) {
+            return (List<Joc>) ois.readObject();
+        } catch (ClassNotFoundException e) {
+            throw new IOException("No s'ha trobat la classe al desserialitzar " + p.getFileName(), e);
+        }
     }
 }
