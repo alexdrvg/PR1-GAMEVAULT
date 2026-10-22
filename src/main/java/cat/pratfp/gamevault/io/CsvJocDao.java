@@ -63,6 +63,28 @@ public class CsvJocDao {
                  * Pista: sessió 5, Ex3LlegeixCsvBrut.
                  */
                 // Escriu aquí el teu codi (PR1-06)
+                if (c.length < 7) {
+                    incidencies.add("línia " + linia + ": incompleta");
+                    continue;
+                }
+
+                try {
+                    jocs.add(new Joc(
+                            Integer.parseInt(c[0].trim()),
+                            c[1].trim(),
+                            c[2].trim(),
+                            c[3].trim(),
+                            LocalDate.parse(c[4].trim()),
+                            Double.parseDouble(c[5].trim()),
+                            Double.parseDouble(c[6].trim())
+                    ));
+                } catch (DateTimeParseException e) {
+                    incidencies.add("línia " + linia + ": data mal formada");
+                } catch (NumberFormatException e) {
+                    incidencies.add("línia " + linia + ": número invàlid");
+                } catch (IllegalArgumentException e) {
+                    incidencies.add("línia " + linia + ": " + e.getMessage());
+                }
             }
         } catch (CsvValidationException e) {
             throw new IOException("CSV mal format a " + p, e);
@@ -81,7 +103,22 @@ public class CsvJocDao {
      */
     public void escriu(Path p, List<Joc> jocs) throws IOException {
         // Escriu aquí el teu codi (PR1-07)
-        throw new UnsupportedOperationException("PR1-07: encara no està fet");
+        try (Writer w = Files.newBufferedWriter(p, StandardCharsets.UTF_8);
+             CSVWriter csvWriter = new CSVWriter(
+                     w,
+                     SEPARADOR,
+                     CSVWriter.DEFAULT_QUOTE_CHARACTER,
+                     CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+                     CSVWriter.DEFAULT_LINE_END)) {
+
+            // Aquí s'escriu la capçalera
+            csvWriter.writeNext(CAPCALERA, false);
+
+            // Aquí s'escriu cada joc convertit a array de String
+            for (Joc j : jocs) {
+                csvWriter.writeNext(aCamps(j), false);
+            }
+        }
     }
 
     /**

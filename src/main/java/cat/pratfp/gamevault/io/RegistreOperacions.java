@@ -36,8 +36,21 @@ public class RegistreOperacions {
      * - Si el fitxer no existeix s'ha de crear; si existeix, NO s'ha de buidar.
      * Pista: sessió 5, Ex1FluxosDeText (StandardOpenOption).
      */
+
     public void registra(String text) throws IOException {
-        // Escriu aquí el teu codi (PR1-05)
-        throw new UnsupportedOperationException("PR1-05: encara no està fet");
+        // Preparem la línia amb la data i hora actual + el text
+        String dataHora = LocalDateTime.now().format(FORMAT);
+        String linia = dataHora + " | " + text;
+
+        // Obrim el BufferedWriter amb UTF-8, CREATE (crea si no existeix) i APPEND (afegeix al final)
+        try (BufferedWriter bw = Files.newBufferedWriter(
+                fitxer,
+                StandardCharsets.UTF_8,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.APPEND)) {
+
+            bw.write(linia);
+            bw.newLine(); // Afegim el salt de línia al final
+        }
     }
 }

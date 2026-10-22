@@ -1,5 +1,6 @@
 package cat.pratfp.gamevault.fs;
 
+import javax.xml.xpath.XPath;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,8 +11,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * El magatzem de fitxers de GameVault: una carpeta base amb tres subcarpetes,
- * import, export i backup.
+ * El magatzem de fitxers de GameVault: una carpeta base amb tres subcarpetes, imp ex copies
  */
 public class Magatzem {
 
@@ -22,36 +22,37 @@ public class Magatzem {
     /**
      * Crea un magatzem sobre una carpeta base. No toca el disc.
      *
-     * @param base carpeta arrel del magatzem (per exemple, Path.of("dades"))
+     * @param base serà la carpeta arrel del magatzem (per exemple, Path.of("dades"))
      */
     public Magatzem(Path base) {
+
         this.base = base;
     }
 
     /** @return la carpeta d'importació (base/import) */
     public Path importacio() {
+
         return base.resolve("import");
     }
 
     /** @return la carpeta d'exportació (base/export) */
     public Path exportacio() {
+
         return base.resolve("export");
     }
 
     /** @return la carpeta de còpies de seguretat (base/backup) */
     public Path copies() {
+
         return base.resolve("backup");
     }
 
-    /*
-     * TODO PR1-02 · Crear l'estructura (CA 1.1)
-     * Crea les tres carpetes: importacio(), exportacio() i copies().
-     * Si ja existeixen, el mètode NO pot fallar: es pot cridar tantes vegades com calgui.
-     * Pista: sessió 2, Ex3CreaCarpetes. Quin dels dos mètodes de Files no peta si la carpeta ja hi és?
-     */
+
     public void preparaEstructura() throws IOException {
-        // Escriu aquí el teu codi (PR1-02)
-        throw new UnsupportedOperationException("PR1-02: encara no està fet");
+        // Escriu aquí el teu CODI (TODO PR1-02)
+        Files.createDirectories(importacio());
+        Files.createDirectories(exportacio());
+        Files.createDirectories(copies());
     }
 
     /*
@@ -66,7 +67,30 @@ public class Magatzem {
      */
     public Path copiaSeguretat(Path fitxer) throws IOException {
         // Escriu aquí el teu codi (PR1-03)
-        throw new UnsupportedOperationException("PR1-03: encara no està fet");
+
+        // primer aconseguim el nom del fitxer
+        String nomFitxer = fitxer.getFileName().toString();
+
+        //Després demanen el lloc en el qual està el . amb el seu índex
+        int puntIndex = nomFitxer.lastIndexOf('.');
+
+        String nom;
+        String terminacio;
+
+        if (puntIndex!=-1) { //si int ha trobat on pot estar l'índex, separa el nom y la terminacio: catalog + csv
+            nom = nomFitxer.substring(0,puntIndex);
+            terminacio = nomFitxer.substring(puntIndex);
+        } else { // si dona error i el fitxer no té cap terminacio es queda igual
+            nom = nomFitxer;
+            terminacio="";
+        }
+        //ho guardem tot ha path que ho posarà en la subcarpeta copies
+        Path destinacio = copies().resolve(nom+"_"+marcaDeTemps()+terminacio);
+
+        //si el destí ja existeix, sobreescriu
+        Files.copy(fitxer,destinacio, StandardCopyOption.REPLACE_EXISTING);
+
+        return destinacio;
     }
 
     /*
@@ -77,7 +101,12 @@ public class Magatzem {
      */
     public long midaTotal() throws IOException {
         // Escriu aquí el teu codi (PR1-04)
-        throw new UnsupportedOperationException("PR1-04: encara no està fet");
+
+        try (Stream<Path> arbre = Files.walk(base)) {
+            return arbre.filter(Files::isRegularFile)
+                    .mapToLong(Magatzem::mida)
+                    .sum();
+        }
     }
 
     /**
