@@ -26,9 +26,21 @@ public class JsonJocDao {
      *   - no peti si el JSON porta camps que Joc no té.
      * Pista: sessió 6, Ex4JsonAmbJackson.
      */
+
     private static ObjectMapper creaMapper() {
         // Escriu aquí el teu codi (PR1-08)
-        return new ObjectMapper();
+        //Creem primer els objectes
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
+        // Les dates com text i no com array
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        // Així no peta si el JSON porta camps que la classe joc no té
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+        return mapper;
+
     }
 
     /*
@@ -37,7 +49,9 @@ public class JsonJocDao {
      */
     public void escriu(Path p, List<Joc> jocs) throws IOException {
         // Escriu aquí el teu codi (PR1-08)
-        throw new UnsupportedOperationException("PR1-08: encara no està fet");
+
+        //Activem el format d'impressió millorat, i converteix llista jocs en format JSON i l'escrivim al fitxer
+        mapper.writerWithDefaultPrettyPrinter().writeValue(p.toFile(), jocs);
     }
 
     /*
