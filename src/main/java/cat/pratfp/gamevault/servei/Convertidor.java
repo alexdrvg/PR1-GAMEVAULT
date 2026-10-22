@@ -50,7 +50,17 @@ public class Convertidor {
      */
     public void desa(Path desti, List<Joc> jocs) throws CatalegException {
         // Escriu aquí el teu codi (PR1-10)
-        throw new UnsupportedOperationException("PR1-10: encara no està fet");
+        try {
+            //Miren de quin tipus és l'extensió del fitxer de destí
+            switch (extensio(desti)) {
+                case "csv" -> csv.escriu(desti, jocs);
+                case "json" -> json.escriu(desti, jocs);
+                default -> throw new CatalegException("Format no suportat: " + desti.getFileName());
+            }
+            //Si no es cap dels dos casos, mandem missatge
+        } catch (IOException e) {
+            throw new CatalegException("No s'ha pogut escriure " + desti.getFileName() + ": " + e.getMessage(), e);
+        }
     }
 
     /**
@@ -63,7 +73,13 @@ public class Convertidor {
      */
     public int converteix(Path origen, Path desti) throws CatalegException {
         // Escriu aquí el teu codi (PR1-10)
-        throw new UnsupportedOperationException("PR1-10: encara no està fet");
+
+        // Carreguem els jocs del fitxer d'origen i els escrivim la llista amb el nou format, al fitxer de destí
+        List<Joc> jocs = carrega(origen);
+        desa(desti, jocs);
+
+        // I retornem quants jocs s'han convertit
+        return jocs.size();
     }
 
     /** Extensió del fitxer en minúscules i sense el punt ("" si no en té). */
