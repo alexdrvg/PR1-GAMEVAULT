@@ -14,7 +14,7 @@ import java.nio.file.Path;
  * <pre>
  *   id (int, 4 bytes) | títol (40 caràcters, 80 bytes) | hores (double, 8 bytes)
  * </pre>
- * El registre de la posició n comença al byte n × MIDA_REGISTRE.
+ * El registre de la posició no comença al byte n × MIDA_REGISTRE.
  */
 public class IndexHores {
 
@@ -68,7 +68,14 @@ public class IndexHores {
      */
     public double llegeixHores(int posicio) throws IOException {
         // Escriu aquí el teu codi (PR1-12)
-        throw new UnsupportedOperationException("PR1-12: encara no està fet");
+
+        try (RandomAccessFile raf = new RandomAccessFile(fitxer.toFile(), "r")) {
+            // Es desplaça el punter directament a la posició de les hores
+            long offsetHores = (long) posicio * MIDA_REGISTRE + Integer.BYTES + (LONG_TITOL * Character.BYTES);
+            raf.seek(offsetHores);
+
+            return raf.readDouble();
+        }
     }
 
     /*
@@ -83,6 +90,20 @@ public class IndexHores {
      */
     public double sumaHores(int posicio, double extra) throws IOException {
         // Escriu aquí el teu codi (PR1-13)
-        throw new UnsupportedOperationException("PR1-13: encara no està fet");
+
+        try (RandomAccessFile raf = new RandomAccessFile(fitxer.toFile(), "rw")) {
+            //Es calcula la posició del camp hores
+            long offsetHores = (long) posicio * MIDA_REGISTRE + Integer.BYTES + (LONG_TITOL * Character.BYTES);
+            raf.seek(offsetHores);
+            double horesActuals = raf.readDouble();
+
+            //Tornem a situar el punter a on estava
+            raf.seek(offsetHores);
+
+            double horesNoves = horesActuals + extra;
+            raf.writeDouble(horesNoves);
+
+            return horesNoves;
+        }
     }
 }
