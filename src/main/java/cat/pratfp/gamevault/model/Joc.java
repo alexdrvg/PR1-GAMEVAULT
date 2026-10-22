@@ -23,5 +23,17 @@ public record Joc(int id, String titol, String plataforma, String estudi,
      */
     public Joc {
         // Escriu aquí el teu codi (PR1-01)
+
+        if (titol == null || titol.isBlank()) {
+            throw new IllegalArgumentException("El títol no pot estar buit ni ser null.");
+        }
+
+        if (horesJugades < 0) {
+            throw new IllegalArgumentException("Les hores jugades no poden ser negatives.");
+        }
+
+        if (nota < 0 || nota > 10) {
+            throw new IllegalArgumentException("La nota ha d'estar entre 0 i 10.");
+        }
     }
 }
